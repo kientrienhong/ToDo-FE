@@ -1,18 +1,54 @@
 import {Box} from "@mui/material";
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
 import ToDo from "../components/ToDo";
 import Button from "@mui/material/Button";
+import ToDoModal from "../components/ToDoModal";
+import ConfirmModal from "../components/ConfirmModal";
+import {getListToDo} from "../apis/Apis";
 export default function HomePage() {
-  const [list, setList] = useState([
-    {isChecked: true, name: "coding"},
-    {isChecked: false, name: "coding"},
-  ]);
+  const [list, setList] = useState([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [currentId, setCurrentId] = useState();
+  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true);
 
-  const mapList = () => list.map((e) => <ToDo toDo={e} />);
+  const handleCloseConfirm = () => setOpenConfirm(false);
+  const handleOpenConfirm = (id) => {
+    setOpenConfirm(true);
+    setCurrentId(id);
+  };
+
+  const mapList = () =>
+    list?.map((e) => (
+      <ToDo toDo={e} key={e._id} handleOpenConfirm={handleOpenConfirm} />
+    ));
+
+  useEffect(() => {
+    const init = async () => {
+      let listToDo = await getListToDo();
+      setList(listToDo.data.data);
+    };
+
+    init();
+  }, []);
 
   return (
     <Box>
+      <ToDoModal
+        open={open}
+        handleClose={handleClose}
+        listToDo={list}
+        setListToDo={setList}
+      />
+      <ConfirmModal
+        open={openConfirm}
+        handleClose={handleCloseConfirm}
+        listToDo={list}
+        setListToDo={setList}
+        currentId={currentId}
+      />
       <Box
         sx={{
           width: "80%",
@@ -58,7 +94,9 @@ export default function HomePage() {
             paddingLeft: "32px",
             paddingRight: "32px",
           }}
-          onClick={async () => {}}
+          onClick={() => {
+            handleOpen();
+          }}
           color="primary"
           variant="contained"
           type="submit"

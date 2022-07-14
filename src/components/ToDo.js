@@ -4,7 +4,7 @@ import Divider from "@mui/material/Divider";
 import Checkbox from "@mui/material/Checkbox";
 import {RadioButtonUnchecked, CheckCircleRounded} from "@mui/icons-material";
 import Typography from "@mui/material/Typography";
-export default function ToDo({toDo}) {
+export default function ToDo({toDo, handleOpenConfirm, listToDo, setListToDo}) {
   return (
     <Box
       sx={{
@@ -31,7 +31,7 @@ export default function ToDo({toDo}) {
             sx={{
               transform: "scale(1.5)",
             }}
-            checked={toDo.isChecked}
+            checked={toDo.isDone}
             icon={<RadioButtonUnchecked />}
             checkedIcon={<CheckCircleRounded />}
           />
@@ -46,6 +46,7 @@ export default function ToDo({toDo}) {
           </Typography>
         </Box>
         <Box
+          onClick={() => handleOpenConfirm(toDo._id)}
           sx={{
             width: "10%",
             display: "flex",
@@ -56,6 +57,7 @@ export default function ToDo({toDo}) {
             src="delete.png"
             alt="delete"
             style={{
+              cursor: "pointer",
               marginBottom: "8px",
             }}
           />
