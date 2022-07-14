@@ -18,8 +18,8 @@ export const createToDo = async (name) => {
 };
 
 export const updateToDo = async (toDo) => {
-  const newToDo = await axios.put(`${domain}/api/v1/todos/${toDo.id}`, {
-    name: toDo.id,
+  const newToDo = await axios.put(`${domain}/api/v1/todos/${toDo._id}`, {
+    name: toDo.name,
     isDone: toDo.isDone,
   });
 

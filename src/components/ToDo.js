@@ -4,7 +4,25 @@ import Divider from "@mui/material/Divider";
 import Checkbox from "@mui/material/Checkbox";
 import {RadioButtonUnchecked, CheckCircleRounded} from "@mui/icons-material";
 import Typography from "@mui/material/Typography";
-export default function ToDo({toDo, handleOpenConfirm, listToDo, setListToDo}) {
+import {updateToDo} from "../apis/Apis";
+export default function ToDo({
+  toDo,
+  handleOpenConfirm,
+  listToDo,
+  setListToDo,
+  setIsLoading,
+}) {
+  const onChangeCheckBox = async (val) => {
+    setIsLoading(true);
+    const toDoTemp = {...toDo, isDone: val.target.checked};
+    await updateToDo(toDoTemp);
+    let tempListToDo = [...listToDo];
+    const indexFound = tempListToDo.findIndex((e) => e._id === toDoTemp._id);
+    tempListToDo[indexFound] = toDoTemp;
+    setListToDo(tempListToDo);
+    setIsLoading(false);
+  };
+
   return (
     <Box
       sx={{
@@ -30,6 +48,9 @@ export default function ToDo({toDo, handleOpenConfirm, listToDo, setListToDo}) {
             size="medium"
             sx={{
               transform: "scale(1.5)",
+            }}
+            onChange={(val) => {
+              onChangeCheckBox(val);
             }}
             checked={toDo.isDone}
             icon={<RadioButtonUnchecked />}

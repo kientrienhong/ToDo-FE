@@ -6,11 +6,14 @@ import Button from "@mui/material/Button";
 import ToDoModal from "../components/ToDoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import {getListToDo} from "../apis/Apis";
+import LinearProgress from "@mui/material/LinearProgress";
 export default function HomePage() {
   const [list, setList] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [open, setOpen] = useState(false);
   const [currentId, setCurrentId] = useState();
+  const [isLoading, setIsLoading] = useState();
+
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
 
@@ -22,13 +25,22 @@ export default function HomePage() {
 
   const mapList = () =>
     list?.map((e) => (
-      <ToDo toDo={e} key={e._id} handleOpenConfirm={handleOpenConfirm} />
+      <ToDo
+        toDo={e}
+        key={e._id}
+        listToDo={list}
+        setListToDo={setList}
+        handleOpenConfirm={handleOpenConfirm}
+        setIsLoading={setIsLoading}
+      />
     ));
 
   useEffect(() => {
     const init = async () => {
+      setIsLoading(true);
       let listToDo = await getListToDo();
       setList(listToDo.data.data);
+      setIsLoading(false);
     };
 
     init();
@@ -36,6 +48,7 @@ export default function HomePage() {
 
   return (
     <Box>
+      {isLoading ? <LinearProgress /> : <Box></Box>}
       <ToDoModal
         open={open}
         handleClose={handleClose}
