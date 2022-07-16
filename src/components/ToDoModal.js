@@ -1,20 +1,49 @@
 import React, {useState} from "react";
 import {Modal, Box, Typography, Button} from "@mui/material";
-import {useForm, Controller} from "react-hook-form";
+import {Controller} from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {createToDo} from "../apis/Apis";
-export default function ToDoModal({open, handleClose, setListToDo, listToDo}) {
-  const {handleSubmit, control} = useForm();
+import {createToDo, updateToDo} from "../apis/Apis";
+export default function ToDoModal({
+  open,
+  handleClose,
+  handleOpenSnackbar,
+  setListToDo,
+  listToDo,
+  currentToDo,
+  handleSubmit,
+  control,
+}) {
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleCreateNewToDo = async (data) => {
+    const newToDo = await createToDo(data.name);
+    setListToDo([...listToDo, newToDo.data.data]);
+    handleOpenSnackbar("success", "Create success");
+  };
+
+  const handleUpdateNewToDo = async (data) => {
+    let toDoTemp = {...currentToDo, name: data.name};
+    await updateToDo(toDoTemp);
+    let tempListToDo = [...listToDo];
+    const indexFound = tempListToDo.findIndex((e) => e._id === toDoTemp._id);
+    tempListToDo[indexFound] = toDoTemp;
+    setListToDo(tempListToDo);
+    handleOpenSnackbar("success", "Update success");
+  };
+
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      const newToDo = await createToDo(data.name);
-      setListToDo([...listToDo, newToDo.data.data]);
+      if (currentToDo) {
+        await handleUpdateNewToDo(data);
+      } else {
+        await handleCreateNewToDo(data);
+      }
       handleClose();
     } catch (error) {
       console.log(error);
+      handleOpenSnackbar("error", error.response.data.message);
     } finally {
       setIsLoading(false);
     }
@@ -64,10 +93,11 @@ export default function ToDoModal({open, handleClose, setListToDo, listToDo}) {
               marginBottom: "1%",
             }}
           >
-            Add new to do
+            {currentToDo ? "Update to do" : "Add new to do"}
           </Typography>
           <Controller
             name={"name"}
+            defaultValue={currentToDo?.name}
             control={control}
             render={({field: {onChange, value}, fieldState: {error}}) => {
               return (

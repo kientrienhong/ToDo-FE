@@ -6,21 +6,41 @@ import Button from "@mui/material/Button";
 import ToDoModal from "../components/ToDoModal";
 import ConfirmModal from "../components/ConfirmModal";
 import {getListToDo} from "../apis/Apis";
+import Snackbar from "@mui/material/Snackbar";
 import LinearProgress from "@mui/material/LinearProgress";
+import MuiAlert from "@mui/material/Alert";
+import {useForm} from "react-hook-form";
+
 export default function HomePage() {
   const [list, setList] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [open, setOpen] = useState(false);
-  const [currentId, setCurrentId] = useState();
+  const [currentToDo, setCurrentToDo] = useState();
   const [isLoading, setIsLoading] = useState();
+  const [snackbarMess, setSnackbarMess] = useState({});
+  const {handleSubmit, control, reset} = useForm();
 
-  const handleClose = () => setOpen(false);
-  const handleOpen = () => setOpen(true);
-
+  const handleClose = () => {
+    setOpen(false);
+    setCurrentToDo();
+    reset();
+  };
+  const handleOpen = (toDo) => {
+    setCurrentToDo(toDo);
+    setOpen(true);
+  };
+  const handleCloseSnackbar = () =>
+    setSnackbarMess({...snackbarMess, open: false});
+  const handleOpenSnackbar = (status, message) =>
+    setSnackbarMess({
+      open: true,
+      message: message,
+      status: status,
+    });
   const handleCloseConfirm = () => setOpenConfirm(false);
-  const handleOpenConfirm = (id) => {
+  const handleOpenConfirm = (toDo) => {
+    setCurrentToDo(toDo);
     setOpenConfirm(true);
-    setCurrentId(id);
   };
 
   const mapList = () =>
@@ -32,8 +52,13 @@ export default function HomePage() {
         setListToDo={setList}
         handleOpenConfirm={handleOpenConfirm}
         setIsLoading={setIsLoading}
+        setCurrentToDo={setCurrentToDo}
+        handleOpen={handleOpen}
       />
     ));
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
 
   useEffect(() => {
     const init = async () => {
@@ -49,18 +74,37 @@ export default function HomePage() {
   return (
     <Box>
       {isLoading ? <LinearProgress /> : <Box></Box>}
+      <Snackbar
+        open={snackbarMess.open}
+        autoHideDuration={1000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{vertical: "top", horizontal: "center"}}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarMess.status}
+          sx={{width: "100%"}}
+        >
+          {snackbarMess.message}
+        </Alert>
+      </Snackbar>
       <ToDoModal
         open={open}
+        currentToDo={currentToDo}
         handleClose={handleClose}
         listToDo={list}
+        handleOpenSnackbar={handleOpenSnackbar}
         setListToDo={setList}
+        handleSubmit={handleSubmit}
+        control={control}
       />
       <ConfirmModal
         open={openConfirm}
         handleClose={handleCloseConfirm}
         listToDo={list}
         setListToDo={setList}
-        currentId={currentId}
+        currentToDo={currentToDo}
+        handleOpenSnackbar={handleOpenSnackbar}
       />
       <Box
         sx={{

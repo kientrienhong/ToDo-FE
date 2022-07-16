@@ -11,6 +11,8 @@ export default function ToDo({
   listToDo,
   setListToDo,
   setIsLoading,
+  setCurrentToDo,
+  handleOpen,
 }) {
   const onChangeCheckBox = async (val) => {
     setIsLoading(true);
@@ -59,7 +61,7 @@ export default function ToDo({
         </Box>
         <Box
           sx={{
-            width: "85%",
+            width: "75%",
           }}
         >
           <Typography color="black" variant="h2">
@@ -67,16 +69,33 @@ export default function ToDo({
           </Typography>
         </Box>
         <Box
-          onClick={() => handleOpenConfirm(toDo._id)}
           sx={{
-            width: "10%",
+            width: "20%",
             display: "flex",
             justifyContent: "flex-end",
           }}
         >
           <img
+            onClick={() => {
+              handleOpen();
+              setCurrentToDo(toDo);
+            }}
+            src="edit.png"
+            alt="edit"
+            width={40}
+            height={40}
+            style={{
+              cursor: "pointer",
+              marginBottom: "8px",
+              marginRight: "16px",
+            }}
+          />
+          <img
+            onClick={() => handleOpenConfirm(toDo)}
             src="delete.png"
             alt="delete"
+            width={40}
+            height={40}
             style={{
               cursor: "pointer",
               marginBottom: "8px",

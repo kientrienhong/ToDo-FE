@@ -7,19 +7,24 @@ export default function ConfirmModal({
   handleClose,
   setListToDo,
   listToDo,
-  currentId,
+  currentToDo,
+  handleOpenSnackbar,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const onDeleteToDo = async () => {
     try {
       setIsLoading(true);
-      await deleteToDo(currentId);
-      let indexFound = listToDo.findIndex((e) => e._id === currentId);
+      await deleteToDo(currentToDo._id);
+      let indexFound = listToDo.findIndex((e) => e._id === currentToDo._id);
       let listTemp = [...listToDo];
       listTemp.splice(indexFound, 1);
       setListToDo(listTemp);
+      handleOpenSnackbar("success", "Delete success");
+
       handleClose();
     } catch (error) {
+      console.log(error);
+      handleOpenSnackbar("error", error?.response?.data?.message);
     } finally {
       setIsLoading(false);
     }
